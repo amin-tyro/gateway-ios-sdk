@@ -43,18 +43,6 @@ class MerchantAPI {
         issueRequest(path: "session.php", method: "POST", completion: completion)
     }
     
-    func check3DSEnrollment(transaction: Transaction, redirectURL: String, completion: @escaping (Result<GatewayMap>) -> Void) {
-        var payload = GatewayMap(["apiOperation": "CHECK_3DS_ENROLLMENT"])
-        payload[at: "order.amount"] = transaction.amountString
-        payload[at: "order.currency"] = transaction.currency
-        payload[at: "session.id"] = transaction.session?.id
-        payload[at: "3DSecure.authenticationRedirect.responseUrl"] = redirectURL
-        
-        let query = [URLQueryItem(name: "3DSecureId", value: transaction.threeDSecureId)]
-        
-        issueRequest(path: "3DSecure.php", method: "PUT", query: query, body: payload, completion: completion)
-    }
-    
     func completeSession(transaction: Transaction, completion: @escaping (Result<GatewayMap>) -> Void) {
         var payload = GatewayMap(["apiOperation": "PAY"])
         payload[at: "sourceOfFunds.type"] =  "CARD"
@@ -63,9 +51,6 @@ class MerchantAPI {
         payload[at: "order.amount"] = transaction.amountString
         payload[at: "order.currency"] = transaction.currency
         payload[at: "session.id"] = transaction.session!.id
-        if let threeDSecureId = transaction.threeDSecureId {
-            payload[at: "3DSecureId"] = threeDSecureId
-        }
         if transaction.isApplePay {
             payload[at: "order.walletProvider"] = "APPLE_PAY"
         }

@@ -62,9 +62,6 @@ struct Transaction {
         return String(repeating: "•", count: dotCount) + last4
     }
     
-    // a 3DSecure ID used to identify the transaction durring the 3DS steps with the gateway
-    var threeDSecureId: String? = Transaction.randomID()
-    
     var pkPaymentRequest: PKPaymentRequest? {
         guard let merchantId = applePayMerchantIdentifier else { return nil }
         let request = PKPaymentRequest()
@@ -73,7 +70,7 @@ struct Transaction {
         request.countryCode = countryCode
         request.currencyCode = currency
         request.supportedNetworks = supportedNetworks
-        request.merchantCapabilities = [.capabilityCredit, .capabilityDebit, .capability3DS]
+        request.merchantCapabilities = [.capabilityCredit, .capabilityDebit]
         return request
     }
     

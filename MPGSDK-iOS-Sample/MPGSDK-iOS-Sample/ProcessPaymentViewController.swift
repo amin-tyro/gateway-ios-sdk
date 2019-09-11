@@ -36,11 +36,6 @@ class ProcessPaymentViewController: UIViewController {
     @IBOutlet weak var updateSessionStatusImageView: UIImageView!
     @IBOutlet weak var updateSessionActivityIndicator: UIActivityIndicatorView!
     
-    
-    @IBOutlet weak var check3dsLabel: UILabel?
-    @IBOutlet weak var check3dsStatusImageView: UIImageView!
-    @IBOutlet weak var check3dsActivityIndicator: UIActivityIndicatorView!
-    
     @IBOutlet weak var processPaymentStatusImageView: UIImageView!
     @IBOutlet weak var processPaymentActivityIndicator: UIActivityIndicatorView!
     
@@ -73,8 +68,6 @@ class ProcessPaymentViewController: UIViewController {
         collectCardActivityIndicator.stopAnimating()
         updateSessionStatusImageView.isHidden = true
         updateSessionActivityIndicator.stopAnimating()
-        check3dsStatusImageView.isHidden = true
-        check3dsActivityIndicator.stopAnimating()
         processPaymentStatusImageView.isHidden = true
         processPaymentActivityIndicator.stopAnimating()
         
@@ -211,138 +204,19 @@ extension ProcessPaymentViewController {
             
             // mark the step as completed
             self.stepCompleted(stepStatusImageView: self.updateSessionStatusImageView)
-            
-            // check for 3DS enrollment
-            self.check3dsEnrollment()
-        }
-    }
-}
 
-// MARK: - 4. Check 3DS Enrollment
-extension ProcessPaymentViewController {
-    // uses the gateway (throught the merchant service) to check the card to see if it is enrolled in 3D Secure
-    func check3dsEnrollment() {
-        // if the transaction is an Apple Pay Transaction, 3DSecure is not supported.  Therfore, the app should skip this step and no longer provide a 3DSecureId
-        guard !transaction.isApplePay else {
-            check3dsActivityIndicator.isHidden = true
-            check3dsStatusImageView.isHidden = true
-            check3dsLabel?.attributedText = NSAttributedString(string: "Check 3DS Enrollment", attributes: [.strikethroughStyle: 1])
-            transaction.threeDSecureId = nil
-            prepareForProcessPayment()
-            return
-        }
-        
-        // update the UI
-        check3dsActivityIndicator.startAnimating()
-        
-        // A redirect URL for 3D Secure that will redirect the browser back to a page on our merchant service after 3D Secure authentication
-        let redirectURL = merchantAPI.merchantServerURL.absoluteString.appending("/3DSecureResult.php?3DSecureId=\(transaction.threeDSecureId!)")
-        // check enrollment
-        merchantAPI.check3DSEnrollment(transaction: transaction, redirectURL: redirectURL , completion: check3DSEnrollmentHandler)
-    }
-    
-    func check3DSEnrollmentHandler(_ result: Result<GatewayMap>) {
-        DispatchQueue.main.async {
-            self.check3dsActivityIndicator.stopAnimating()
-            if Int(self.transaction.session!.apiVersion)! <= 46 {
-                self.check3DSEnrollmentV46Handler(result)
-            } else {
-                self.check3DSEnrollmentv47Handler(result)
-            }
-        }
-    }
-    
-    func check3DSEnrollmentV46Handler(_ result: Result<GatewayMap>) {
-        guard case .success(let response) = result, let code = response[at: "gatewayResponse.3DSecure.summaryStatus"] as? String else {
-            self.stepErrored(message: "Error checking 3DS Enrollment", stepStatusImageView: self.check3dsStatusImageView)
-            return
-        }
-        
-        // check to see if the card was enrolled, not enrolled or does not support 3D Secure
-        switch code {
-        case "CARD_ENROLLED":
-            // For enrolled cards, get the htmlBodyContent and present the Gateway3DSecureViewController
-            if let html = response[at: "gatewayResponse.3DSecure.authenticationRedirect.simple.htmlBodyContent"] as? String {
-                self.begin3DSAuth(simple: html)
-            }
-        case "CARD_DOES_NOT_SUPPORT_3DS":
-            // for cards that do not support 3DSecure, go straight to payment confirmation without a 3DSecureID
-            self.transaction.threeDSecureId = nil
-            self.stepCompleted(stepStatusImageView: self.check3dsStatusImageView)
-            self.prepareForProcessPayment()
-        case "CARD_NOT_ENROLLED", "AUTHENTICATION_NOT_AVAILABLE":
-            // for cards that are not enrolled or if authentication is not available, go to payment confirmation but include the 3DSecureID
-            self.stepCompleted(stepStatusImageView: self.check3dsStatusImageView)
-            self.prepareForProcessPayment()
-        default:
-            self.stepErrored(message: "Error checking 3DS Enrollment", stepStatusImageView: self.check3dsStatusImageView)
-        }
-    }
-    
-    func check3DSEnrollmentv47Handler(_ result: Result<GatewayMap>) {
-        guard case .success(let response) = result, let recommendaition = response[at: "gatewayResponse.response.gatewayRecommendation"] as? String else {
-            self.stepErrored(message: "Error checking 3DS Enrollment", stepStatusImageView: self.check3dsStatusImageView)
-            return
-        }
-        
-        // if DO_NOT_PROCEED returned in recommendation, should stop transaction
-        if recommendaition == "DO_NOT_PROCEED" {
-            self.stepErrored(message: "3DS Do Not Proceed", stepStatusImageView: self.check3dsStatusImageView)
-        }
-        
-        // if PROCEED in recommendation, and we have HTML for 3DS, perform 3DS
-        if let html = response[at: "gatewayResponse.3DSecure.authenticationRedirect.simple.htmlBodyContent"] as? String {
-            self.begin3DSAuth(simple: html)
-        } else {
-            // if PROCEED in recommendation, but no HTML, finish the transaction without 3DS
             self.prepareForProcessPayment()
         }
     }
-    
-    fileprivate func begin3DSAuth(simple: String) {
-        // instatniate the Gateway 3DSecureViewController and present it
-        let threeDSecureView = Gateway3DSecureViewController(nibName: nil, bundle: nil)
-        present(threeDSecureView, animated: true)
-        
-        // Optionally customize the presentation
-        threeDSecureView.title = "3-D Secure Auth"
-        threeDSecureView.navBar.tintColor = brandColor
-        
-        // Start 3D Secure authentication by providing the view with the HTML content provided by the check enrollment step
-        threeDSecureView.authenticatePayer(htmlBodyContent: simple, handler: handle3DS(authView:result:))
-    }
-    
-    func handle3DS(authView: Gateway3DSecureViewController, result: Gateway3DSecureResult) {
-        // dismiss the 3DSecureViewController
-        authView.dismiss(animated: true, completion: {
-            switch result {
-            case .error(_):
-                self.stepErrored(message: "3DS Authentication Failed", stepStatusImageView: self.check3dsStatusImageView)
-            case .completed(gatewayResult: let response):
-                // check for version 46 and earlier api authentication failures and then version 47+ failures
-                if Int(self.transaction.session!.apiVersion)! <= 46, let status = response[at: "3DSecure.summaryStatus"] as? String , status == "AUTHENTICATION_FAILED" {
-                    self.stepErrored(message: "3DS Authentication Failed", stepStatusImageView: self.check3dsStatusImageView)
-                } else if let status = response[at: "response.gatewayRecommendation"] as? String, status == "DO_NOT_PROCEED"  {
-                    self.stepErrored(message: "3DS Authentication Failed", stepStatusImageView: self.check3dsStatusImageView)
-                } else {
-                    // if authentication succeeded, continue to proceess the payment
-                    self.stepCompleted(stepStatusImageView: self.check3dsStatusImageView)
-                    self.prepareForProcessPayment()
-                }
-            default:
-                self.stepErrored(message: "3DS Authentication Cancelled", stepStatusImageView: self.check3dsStatusImageView)
-            }
-        })
-    }
-    
+
     func prepareForProcessPayment() {
-        statusTitleLabel?.text = "Confirm Payment Details"
-        if transaction.isApplePay {
-            statusDescriptionLabel?.text = "Apple Pay\n\(transaction.amountFormatted)"
-        } else {
-            statusDescriptionLabel?.text = "\(transaction.maskedCardNumber!)\n\(transaction.amountFormatted)"
-        }
-        setAction(action: processPayment, title: "Confirm and Pay")
+            statusTitleLabel?.text = "Confirm Payment Details"
+            if transaction.isApplePay {
+                statusDescriptionLabel?.text = "Apple Pay\n\(transaction.amountFormatted)"
+            } else {
+                statusDescriptionLabel?.text = "\(transaction.maskedCardNumber!)\n\(transaction.amountFormatted)"
+            }
+            setAction(action: processPayment, title: "Confirm and Pay")
     }
 }
 
