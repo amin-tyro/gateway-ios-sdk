@@ -31,7 +31,7 @@ struct Transaction {
     var amount: NSDecimalNumber = 1.0
     var amountString = "1.00"
     var amountFormatted = "$1.00"
-    var currency = "USD"
+    var currency = "AUD"
     var summary = "Some transaction"
     
     // card information
