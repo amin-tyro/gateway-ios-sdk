@@ -602,30 +602,10 @@
                                                     </activityIndicatorView>
                                                 </subviews>
                                             </stackView>
-                                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7TG-WC-Pmn">
+                                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5Tn-Zh-ID7">
                                                 <rect key="frame" x="0.0" y="78" width="315" height="20"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" text="4. Check 3DS Enrollment" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gro-ou-8ZM">
-                                                        <rect key="frame" x="0.0" y="0.0" width="275" height="20"/>
-                                                        <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
-                                                        <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="100" image="check" translatesAutoresizingMaskIntoConstraints="NO" id="S0L-Qv-B0D">
-                                                        <rect key="frame" x="275" y="0.0" width="20" height="20"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="width" secondItem="S0L-Qv-B0D" secondAttribute="height" multiplier="1:1" id="7UN-Oi-PZc"/>
-                                                        </constraints>
-                                                    </imageView>
-                                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="Pa1-xR-nf4">
-                                                        <rect key="frame" x="295" y="0.0" width="20" height="20"/>
-                                                    </activityIndicatorView>
-                                                </subviews>
-                                            </stackView>
-                                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5Tn-Zh-ID7">
-                                                <rect key="frame" x="0.0" y="104" width="315" height="20"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" text="5. Process Payment" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OA2-XT-OQU">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" text="4. Process Payment" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OA2-XT-OQU">
                                                         <rect key="frame" x="0.0" y="0.0" width="275" height="20"/>
                                                         <fontDescription key="fontDescription" type="system" weight="light" pointSize="14"/>
                                                         <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -645,10 +625,10 @@
                                         </subviews>
                                     </stackView>
                                     <view contentMode="scaleToFill" verticalHuggingPriority="300" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="ACO-Re-FJA">
-                                        <rect key="frame" x="0.0" y="174.33333333333329" width="315" height="421.66666666666674"/>
+                                        <rect key="frame" x="0.0" y="158.33333333333329" width="315" height="437.66666666666674"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="900" axis="vertical" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="2fw-Lg-z0F">
-                                                <rect key="frame" x="0.0" y="137" width="315" height="148"/>
+                                                <rect key="frame" x="0.0" y="145" width="315" height="148"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t4C-wf-KRw">
                                                         <rect key="frame" x="112.66666666666666" y="0.0" width="90" height="90"/>
@@ -684,7 +664,7 @@
                                                         </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="900" layoutMarginsFollowReadableWidth="YES" text="Your payment was successfull!" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="sae-aq-zaP">
-                                                        <rect key="frame" x="24" y="98.000000000000057" width="267" height="21.666666666666671"/>
+                                                        <rect key="frame" x="24" y="98" width="267" height="21.666666666666671"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -745,9 +725,6 @@
                         <barButtonItem key="backBarButtonItem" title=" " id="5Vj-WW-mf9"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="check3dsActivityIndicator" destination="Pa1-xR-nf4" id="fSm-QF-RL8"/>
-                        <outlet property="check3dsLabel" destination="Gro-ou-8ZM" id="s1f-kt-xQv"/>
-                        <outlet property="check3dsStatusImageView" destination="S0L-Qv-B0D" id="Dy1-dw-mRR"/>
                         <outlet property="collectCardActivityIndicator" destination="yU6-aq-mnV" id="xiU-1C-inK"/>
                         <outlet property="collectCardStatusImageView" destination="Oci-I0-Iow" id="Fhu-Qv-UoQ"/>
                         <outlet property="continueButton" destination="77h-vW-afe" id="Aol-gX-ind"/>
